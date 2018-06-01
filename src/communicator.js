@@ -1,6 +1,7 @@
 const WebSocket = require('websocket').w3cwebsocket;
 import uuidv1 from 'uuid/v1';
 import Connected from './utils/connected';
+import {serialize, deserialize} from './utils/serializer';
 
 export default Connected(class Communicator{
   constructor(options, onMessage){
@@ -20,7 +21,7 @@ export default Connected(class Communicator{
     });
   }
   _parseMessage(response){
-    let d = JSON.parse(response.data);
+    let d = deserialize(response.data);
     if(d.k){
       const promise = this._requests.get(d.k);
       if(promise){
@@ -39,7 +40,7 @@ export default Connected(class Communicator{
     });
   }
   send(data){
-    this.connection.send(JSON.stringify(data));
+    this.connection.send(serialize(data));
   }
   close(){
     this.connection.close();
