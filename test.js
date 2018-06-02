@@ -2,7 +2,7 @@ import DataStruct from '../js-transaction-object';
 import Client from './src/client';
 import DataClient from './src/dataclient';
 
-let obj = new DataStruct({a:{a1:1,a2:1.2},b:2});
+let obj = new DataStruct();
 let data = obj.data;
 
 let client = new Client({
@@ -11,15 +11,19 @@ let client = new Client({
   }
 })
 
+let start = new Date();
+
 new DataClient(client, obj)
 .connected(() => {
-  delete data.a.a2;
+  console.log(obj.toJS());
+  console.log(new Date().getTime() - start.getTime());
+/*  delete data.a.a2;
 
   data.a.a2 = {c:1};
 
   for(let i = 0; i < 5; i++){
     data.a.a1++;
-  }
+  }*/
 });
 
 /*

@@ -9,7 +9,8 @@ export default Connected(class DataClient{
     this._waitUntil(() => {
       this.client.connected(() => {
         this.datastruct.subscribe(this.dataChange.bind(this));
-        this.client.request(REQUEST_LOADALL).then(e=>{
+        this.client.request(REQUEST_LOADALL).then(({d,v})=>{
+          this.datastruct.replace(d,v);
           this._loaded();
         });
       });
