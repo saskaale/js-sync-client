@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --compilers babel-register --require babel-polyfill",
-    "start": "./node_modules/.bin/babel-node --presets=es2015,es2016,es2017 ./test.js"
+    "start": "npx babel-node --presets=es2015,es2016,es2017 ./test.js"
   },
   "author": "Ales Saska",
   "license": "ISC",

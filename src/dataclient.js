@@ -17,10 +17,10 @@ export default Connected(class DataClient{
     });
   }
   dataChange(uuid,diff){
-    console.log('datachange')
+    console.log('datachange');
     /**** TODO: rewrite this to not use a callback for better performance ****/
     this.client.request(REQUEST_DATACHANGE,{
-      change: diff,
+      diff,
       uuid,
       tm: this.client.ntpservice.getTime()
     });
