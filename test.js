@@ -7,16 +7,23 @@ let data = obj.data;
 
 let client = new Client({
   CommunicatorOptions: {
-    url: 'ws://localhost:40510'
+    url: 'ws://localhost:8081'
   }
 })
 
 let start = new Date();
 
+console.log("START dataclient");
+
 new DataClient(client, obj)
 .connected(() => {
-  console.log(obj.toJS());
-  console.log(new Date().getTime() - start.getTime());
+  console.log("object from data is");
+  setInterval(() => {
+    process.stdout.clearLine();  // clear current text
+    process.stdout.cursorTo(0);
+    process.stdout.write(JSON.stringify(obj.immutable.toJSON()));
+  }, 500);
+//  console.log(new Date().getTime() - start.getTime());
 /*  delete data.a.a2;
 
   data.a.a2 = {c:1};
