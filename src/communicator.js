@@ -3,10 +3,12 @@ import uuidv1 from 'uuid/v1';
 import Connected from './utils/connected';
 import {serialize, deserialize} from './utils/serializer';
 
+const defaultOptions = {VERBOSE: 1};
+
 export default Connected(class Communicator{
   constructor(options, listener){
     this._requests = new Map();
-    this._options = options;
+    this._options = {...defaultOptions, ...options};
 
     if(this._options.VERBOSE)
       console.log('created ws client class');
@@ -21,7 +23,7 @@ export default Connected(class Communicator{
       this.connection.onopen = (evt) => {
           if(this._options.VERBOSE)
             console.log('ws client connected');
-  
+
           this._loaded();
       }
       this.connection.onclose = (evt) => {
@@ -55,7 +57,7 @@ export default Connected(class Communicator{
   }
   send(data){
     if(this._options.VERBOSE)
-      console.log('send to server >>>'+data+'<<<');
+      console.log('send to server >>>'+JSON.stringify(data)+'<<<');
     this.connection.send(serialize(data));
   }
   close(){
