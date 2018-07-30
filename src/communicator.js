@@ -38,7 +38,10 @@ export default Connected(class Communicator{
     if(d.k){
       const promise = this._requests.get(d.k);
       if(promise){
-        promise.resolve(d.d);
+        if(d.err)
+          promise.reject(d);
+        else
+          promise.resolve(d.d);
         this._requests.delete(d.k);
         return;
       }
@@ -52,7 +55,12 @@ export default Connected(class Communicator{
     if(!request.k) request.k = uuidv1();
     return new Promise((resolve, reject) => {
       this._requests.set(request.k, {resolve, reject});
-      this.send(request);
+      try{
+        this.send(request);
+      }catch(e){
+        this._requests.delete(request.k);
+        reject();
+      }
     });
   }
   send(data){

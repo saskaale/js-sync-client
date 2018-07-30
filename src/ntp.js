@@ -30,7 +30,10 @@ export default Connected(class NTP{
             this.servClientdiff = syncedServerTime - new Date().getTime();
 
             this._loaded();
-        }).catch(this.refresh.bind(this));
+        }).catch(() => {
+          console.log("CATCH");
+          this.refresh();
+        });
       }
     });
     this.refresh();

@@ -12,15 +12,30 @@ export default Connected(class DataClient{
     this.client = client;
     this.datastruct = datastruct;
 
+    setInterval(() => {
+      this.datastruct.data.cnt = (this.datastruct.data.cnt || 0) + 1;
+    }, 1000);
+
     this._requests = {
       [REQUEST_SERVERCHANGE] : this.requestServerDatachange.bind(this)
     };
 
     this._waitUntil(() => {
       let action = () => {
-        this.request(REQUEST_LOADALL, {s:this.struct_uuid}).then(d=>{
+        this.request(REQUEST_LOADALL).then(d=>{
           console.log("LOADED DATA FROM REQUEST");
           console.log(d);
+          this.datastruct.subscribe((d) => {
+              console.log("SUBSCRIBE change");
+              console.log(d);
+              this.request(REQUEST_CLIENTCHANGE, d)
+                  .then(d=>{
+                    console.log('REQUEST result');
+                    console.log(d);
+                  }).catch(d=>{
+                    console.log('REQUEST catch');
+                  });
+            });
 //        this.datastruct.subscribe(this.dataChange.REQUEST_LOADALL, {s:this.struct_uuid}).then(d=>{
           this.datastruct.fromJS(d);
           this._loaded();

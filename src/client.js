@@ -30,12 +30,12 @@ export default Connected(class Client{
         .connected(() => {
           this.ntpservice.connected(this._loaded.bind(this));
 
-          console.log("object from data is");
+/*          console.log("object from data is");
           setInterval(() => {
             process.stdout.clearLine();  // clear current text
             process.stdout.cursorTo(0);
             process.stdout.write(JSON.stringify(this.config.immutable.toJSON()));
-          }, 500);
+          }, 500);*/
         });
 
       });
