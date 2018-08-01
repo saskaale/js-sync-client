@@ -2,11 +2,14 @@ const WebSocket = require('websocket').w3cwebsocket;
 import uuidv1 from 'uuid/v1';
 import Connected from './utils/connected';
 import {serialize, deserialize} from './utils/serializer';
+import EventEmitter from 'wolfy87-eventemitter';
 
 const defaultOptions = {VERBOSE: 1};
 
-export default Connected(class Communicator{
+export default Connected(class Communicator extends EventEmitter{
   constructor(options, listener){
+    super();
+
     this._requests = new Map();
     this._options = {...defaultOptions, ...options};
 
@@ -15,20 +18,36 @@ export default Connected(class Communicator{
 
     this.connection = new WebSocket(options.url);
     this._listener = listener
+    this._closed = false;
 
     this._connect();
   }
   _connect(){
-    this._waitUntil(() => {
-      this.connection.onopen = (evt) => {
-          if(this._options.VERBOSE)
-            console.log('ws client connected');
+    let reconnect = (after) => {
+      if(this._closed){
+        return;
+      }
 
-          this._loaded();
+      this.connection.onopen = (evt) => {
+        if(this._options.VERBOSE)
+          console.log('ws client connected');
+
+        this.emitEvent('open');
+        console.log("OPENEEEE");
+        if(after)
+          after();
       }
       this.connection.onclose = (evt) => {
+        this.emitEvent('close');
+        reconnect(() => {
+          this.emitEvent('reconnect');
+        });
       }
       this.connection.onmessage = this._parseMessage.bind(this);
+    };
+    
+    this._waitUntil(()=>{
+      reconnect(this._loaded.bind(this))
     });
   }
   _parseMessage(response){
@@ -71,6 +90,7 @@ export default Connected(class Communicator{
   close(){
     if(this._options.VERBOSE)
       console.log('ws client closed');
+    this._closed = true;
     this.connection.close();
   }
 });

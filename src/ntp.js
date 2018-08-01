@@ -36,7 +36,7 @@ export default Connected(class NTP{
         });
       }
     });
-    this.refresh();
+    communicator.on('open', this.refresh.bind(this));
   }
   getTime(){
     return new Date().getTime() + this.servClientdiff;
