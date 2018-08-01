@@ -16,8 +16,7 @@ export default Connected(class Communicator extends EventEmitter{
     if(this._options.VERBOSE)
       console.log('created ws client class');
 
-    this.connection = new WebSocket(options.url);
-    this._listener = listener
+    this._listener = listener;
     this._closed = false;
 
     this._connect();
@@ -28,12 +27,13 @@ export default Connected(class Communicator extends EventEmitter{
         return;
       }
 
+      this.connection = new WebSocket(this._options.url);
       this.connection.onopen = (evt) => {
+        
         if(this._options.VERBOSE)
           console.log('ws client connected');
 
         this.emitEvent('open');
-        console.log("OPENEEEE");
         if(after)
           after();
       }
@@ -88,6 +88,7 @@ export default Connected(class Communicator extends EventEmitter{
     this.connection.send(serialize(data));
   }
   close(){
+    console.log("MANUAL CLOSE");
     if(this._options.VERBOSE)
       console.log('ws client closed');
     this._closed = true;

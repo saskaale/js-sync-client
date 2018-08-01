@@ -6,6 +6,8 @@ export default Connected(class NTP{
     this._ready = [];
     this.loaded = false;
 
+    
+
     this._waitUntil(() =>{
       this.refresh = () => {
         /*
@@ -15,6 +17,7 @@ export default Connected(class NTP{
           {
             ct:new Date().getTime()
           }).then((data) => {
+            console.log('eeee');
             const nowTimeStamp = new Date().getTime();
             const serverClientRequestDiffTime = data.diff;
             const serverTimestamp = data.serverTimestamp;
@@ -30,13 +33,13 @@ export default Connected(class NTP{
             this.servClientdiff = syncedServerTime - new Date().getTime();
 
             this._loaded();
-        }).catch(() => {
-          console.log("CATCH");
+        });/*.catch(() => {
+//          console.log("CATCH");
           this.refresh();
-        });
-      }
+        });*/
+      };
+      communicator.on('open', () => this.refresh());
     });
-    communicator.on('open', this.refresh.bind(this));
   }
   getTime(){
     return new Date().getTime() + this.servClientdiff;

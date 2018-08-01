@@ -1,15 +1,16 @@
 export default (Parent) => {
   return class extends Parent{
     _waitUntil(f){
+      if(!this.loaded) this.loaded = {};
+      this._initStatus = this._initStatus || 0;
+
+      this._ready = this._ready || [];
+
       this.INIT_STEPS = this.INIT_STEPS || 0;
       this.INIT_STEPS++;
       f();
     }
-    connected(f){
-      this._ready = this._ready || [];
-      this._initStatus = this._initStatus || 0;
-      this.loaded = {};
-      this.INIT_STEPS = 1;
+    connected(f, k = ""){
       if(this._initStatus < this.INIT_STEPS){
         this._ready.push(f);
       }else{
@@ -20,6 +21,8 @@ export default (Parent) => {
       if(!this.loaded[k]){
         this._initStatus++;
       }
+      this.loaded[k] = true;
+
       if(this._initStatus >= this.INIT_STEPS){
         this._ready.forEach(f=>f());
         this._ready = [];
