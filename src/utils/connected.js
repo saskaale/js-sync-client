@@ -18,6 +18,9 @@ export default (Parent) => {
       }
     }
     _loaded(k = ""){
+      console.log("LOADED");
+      console.log(this);
+      console.log(this._ready);
       if(!this.loaded[k]){
         this._initStatus++;
       }

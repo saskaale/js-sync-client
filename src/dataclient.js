@@ -1,5 +1,5 @@
 import {REQUEST_LOADALL, REQUEST_CLIENTCHANGE, REQUEST_SERVERCHANGE} from './constants';
-import {merger} from '../../js-transaction-object';
+import {merger, MERGER_STRATEGIES} from '../../js-transaction-object';
 import Connected from './utils/connected';
 import uuidv1 from 'uuid/v1';
 
@@ -16,24 +16,29 @@ export default Connected(class DataClient{
       [REQUEST_SERVERCHANGE] : this.requestServerDatachange.bind(this)
     };
 
+    this._subscriber = (d) => {
+      const {srcuuid} = d;
+      this.request(REQUEST_CLIENTCHANGE, d)
+          .then(({applied})=>{
+            if(!applied){
+                this.datastruct.rollback(srcuuid);
+            }
+          }).catch(d=>{
+//            console.log('REQUEST catch');
+          });
+    };
+
+    console.log("DATACLIENT "+name);
+
+
     this._waitUntil(() => {
       let action = () => {
+        console.log("SUBSCRIBE TO "+name);
         this.loadAll().then( () => {
-          this.datastruct.subscribe((d) => {
-            this.request(REQUEST_CLIENTCHANGE, d)
-                .then(d=>{
-                  console.log('REQUEST result');
-                  console.log(d);
-                }).catch(d=>{
-                  console.log('REQUEST catch');
-                });
-          });
-  //        this.datastruct.subscribe(this.dataChange.REQUEST_LOADALL, {s:this.struct_uuid}).then(d=>{
-
+          console.log("AFTER CONNECTED SUBSCRIBE TO "+name);
+          this._unsubscribe = this.datastruct.subscribe(this._subscriber);
           this._loaded();
         } );
-
-        this.client.registerListener(this.uuid, this.dataListener.bind(this));
       };
       internal ? action() : this.client.connected(action);
     });
@@ -49,9 +54,10 @@ export default Connected(class DataClient{
   request(type, data = undefined){
     return this.client.request(type, {s: this.struct_uuid, d:data});
   }
-  dataListener(data){
+  doRequest(data){
     if(this._requests[data.t])
-      this._requests[data.t](data.d);
+      return this._requests[data.t](data.d);
+    return {"status": "success"};
   }
   dataChange(uuid,diff){
     /**** TODO: rewrite this to not use a callback for better performance ****/
@@ -62,8 +68,13 @@ export default Connected(class DataClient{
     });
   }
   requestServerDatachange(d){
-    console.log("SERVER sent datachange");
-    console.log(d);
-    merger(this.datastruct, d.d);
+    return merger(
+      this.datastruct,
+      d,
+      {
+        skipSubscribers : new Set([this._subscriber]),
+        strategy        : MERGER_STRATEGIES.REMOTE
+      }
+    );
   }
 });

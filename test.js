@@ -1,13 +1,13 @@
-import DataStruct from '../js-transaction-object';
 import Client from './src/client';
-import DataClient from './src/dataclient';
+const WebSocket = require('websocket').w3cwebsocket;
 
 //let obj = new DataStruct();
 //let data = obj.data;
 
 let client = new Client({
   CommunicatorOptions: {
-    url: 'ws://localhost:8081'
+    url: 'ws://localhost:8081',
+    WebSocket,
   }
 })
 

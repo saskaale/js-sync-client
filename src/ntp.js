@@ -13,11 +13,12 @@ export default Connected(class NTP{
         /*
          Implementation of the NTP protocol
          */
+        console.log('NTP request');
         communicator.request(REQUEST_NTP,
           {
             ct:new Date().getTime()
           }).then((data) => {
-            console.log('eeee');
+            console.log('NTP received');
             const nowTimeStamp = new Date().getTime();
             const serverClientRequestDiffTime = data.diff;
             const serverTimestamp = data.serverTimestamp;
@@ -32,6 +33,7 @@ export default Connected(class NTP{
             const syncedServerTime = nowTimeStamp + serverClientResponseDiffTime - responseTime;
             this.servClientdiff = syncedServerTime - new Date().getTime();
 
+            console.log("NTP loaded");
             this._loaded();
         });/*.catch(() => {
 //          console.log("CATCH");

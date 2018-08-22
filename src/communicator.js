@@ -1,4 +1,3 @@
-const WebSocket = require('websocket').w3cwebsocket;
 import uuidv1 from 'uuid/v1';
 import Connected from './utils/connected';
 import {serialize, deserialize} from './utils/serializer';
@@ -23,13 +22,16 @@ export default Connected(class Communicator extends EventEmitter{
   }
   _connect(){
     let reconnect = (after) => {
+      console.log("reconnect");
       if(this._closed){
         return;
       }
 
-      this.connection = new WebSocket(this._options.url);
+      this.connection = new this._options.WebSocket(this._options.url);
       this.connection.onopen = (evt) => {
         
+        console.log("onpen");
+
         if(this._options.VERBOSE)
           console.log('ws client connected');
 
